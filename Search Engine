@@ -1,0 +1,58 @@
+public class SearchEngine {
+    // index that will map each term to the set of webpages it appears in.
+    private Map<String, Set<String>> invertIndex;
+    
+    // Creates an index following a SearchEngine use.
+    public SearchEngine() {
+        this.invertIndex = new HashMap <String, Set<String>>();
+    }
+    
+    // When client adds web page to the search engine, this method indexes the document parameter
+    // by linking terms in the document with the original document itself. It also ignores 
+    // special characters by using the split method provided.
+    public void index(String document) {
+        Set<String> split = split(document);
+        for (String word : split) {
+           for (String s: invertIndex.keySet()) {
+                if (s.contains(word)) {
+                    invertIndex.get(s).add(word);
+                } else {
+                    Set<String> curr = new HashSet<String>();
+                    curr.add(word);
+                    invertIndex.put(word, curr);
+                }
+            } 
+        }   
+    }
+        
+    // Ignores any term that wasn't apart of the index, based on the string query, it returns the
+    // set of documents containing all the terms in the given query. If no terms are indexed or 
+    // query is empty then an empty set should be returned.
+    public Set<String> search(String query) {
+        for (String s : invertIndex.keySet()) {
+            if (s.equals(query)) {
+                Set<String> temp = invertIndex.get(s);
+                if (temp.isEmpty()) {
+                    Set<String> empty = new HashSet<String>();
+                    return empty;
+                } else {
+                    return temp;
+                }
+            }
+        }
+        Set<String> empty = new HashSet<String>();
+        return empty;
+    }
+
+
+    // Return the set of normalized terms split from the given text
+    private static Set<String> split(String text) {
+        Set<String> result = new HashSet<>();
+        for (String term : text.split("\\s+")) {
+            term = normalize(term);
+            if (!term.isEmpty()) {
+                result.add(term);
+            }
+        }
+        return result;
+    }
